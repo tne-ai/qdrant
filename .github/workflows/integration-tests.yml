@@ -73,8 +73,8 @@ jobs:
         uses: actions/cache@v3
         with:
           path: .pytest_cache
-          key: pytest-cache-${{ github.run_id }}
-          restore-keys: pytest-cache-
+          key: pytest-cache-${{ github.ref }}-${{ github.run_id }}
+          restore-keys: pytest-cache-${{ github.ref }}
       - name: Run integration tests - multiple peers - pytest
         run: poetry -C tests run pytest tests/consensus_tests --failed-first --new-first --durations=10
         timeout-minutes: 60
@@ -82,7 +82,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: .pytest_cache
-          key: pytest-cache-${{ github.run_id }}
+          key: pytest-cache-${{ github.ref }}-${{ github.run_id }}
       - name: upload logs in case of failure
         uses: actions/upload-artifact@v4
         if: failure() || cancelled()
