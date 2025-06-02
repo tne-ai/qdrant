@@ -9,7 +9,6 @@ use super::postings_iterator::intersect_postings_iterator;
 use crate::common::operation_error::OperationResult;
 
 #[cfg_attr(test, derive(Clone))]
-#[derive(Default)]
 pub struct MutableInvertedIndex {
     pub(super) postings: Vec<PostingList>,
     pub(super) vocab: HashMap<String, TokenId>,
@@ -23,42 +22,56 @@ pub struct MutableInvertedIndex {
 }
 
 impl MutableInvertedIndex {
+    /// Create a new inverted index with or without positional information.
+    pub fn new(with_positions: bool) -> Self {
+        Self {
+            postings: Vec::new(),
+            vocab: HashMap::new(),
+            point_to_tokens: Vec::new(),
+            point_to_doc: with_positions.then_some(Vec::new()),
+            points_count: 0,
+        }
+    }
+
     pub fn build_index(
         iter: impl Iterator<Item = OperationResult<(PointOffsetType, impl Iterator<Item = String>)>>,
         phrase_matching: bool,
     ) -> OperationResult<Self> {
-        let mut index = Self::default();
-
-        if phrase_matching {
-            index.point_to_doc = Some(Default::default());
-        }
+        let mut index = Self::new(phrase_matching);
 
         // update point_to_doc and point_to_tokens
         for item in iter {
             index.points_count += 1;
             let (idx, str_tokens_iter) = item?;
 
+            // resize point_to_* structures if needed
             if index.point_to_tokens.len() <= idx as usize {
                 index
                     .point_to_tokens
                     .resize_with(idx as usize + 1, Default::default);
+
+                if let Some(point_to_doc) = &mut index.point_to_doc {
+                    point_to_doc.resize_with(idx as usize + 1, Default::default);
+                }
             }
 
             let tokens = index.register_tokens(str_tokens_iter);
 
+            // insert as whole document
             if let Some(point_to_doc) = &mut index.point_to_doc {
                 point_to_doc[idx as usize] = Some(Document::new(tokens.clone()));
             }
 
+            // insert as tokenset
             let tokens_set = TokenSet::from_iter(tokens);
             index.point_to_tokens[idx as usize] = Some(tokens_set);
         }
 
-        // build postings from point_to_docs
+        // build postings from point_to_tokens
         // build in order to increase document id
-        for (idx, doc) in index.point_to_tokens.iter().enumerate() {
-            if let Some(doc) = doc {
-                for token_idx in doc.tokens() {
+        for (idx, tokenset) in index.point_to_tokens.iter().enumerate() {
+            if let Some(tokenset) = tokenset {
+                for token_idx in tokenset.tokens() {
                     if index.postings.len() <= *token_idx as usize {
                         index
                             .postings
@@ -171,7 +184,7 @@ impl InvertedIndex for MutableInvertedIndex {
             .write_back_counter();
 
         // Ensure container has enough capacity
-        if point_to_doc.len() <= point_id as usize {
+        if point_id as usize >= point_to_doc.len() {
             let new_len = point_id as usize + 1;
 
             hw_cell_wb.incr_delta((new_len - point_to_doc.len()) * size_of::<Option<Document>>());
@@ -186,7 +199,7 @@ impl InvertedIndex for MutableInvertedIndex {
     }
 
     fn remove(&mut self, idx: PointOffsetType) -> bool {
-        if self.point_to_tokens.len() <= idx as usize {
+        if idx as usize >= self.point_to_tokens.len() {
             return false; // Already removed or never actually existed
         }
 
@@ -194,16 +207,16 @@ impl InvertedIndex for MutableInvertedIndex {
             return false;
         };
 
+        if let Some(point_to_doc) = &mut self.point_to_doc {
+            point_to_doc[idx as usize] = None;
+        }
+
         self.points_count -= 1;
 
         for removed_token in removed_token_set.tokens() {
             // unwrap safety: posting list exists and contains the point idx
             let posting = self.postings.get_mut(*removed_token as usize).unwrap();
             posting.remove(idx);
-        }
-
-        if let Some(point_to_doc) = &mut self.point_to_doc {
-            point_to_doc[idx as usize] = None;
         }
 
         true
