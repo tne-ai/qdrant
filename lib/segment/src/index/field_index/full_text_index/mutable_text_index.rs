@@ -1,6 +1,7 @@
+use std::collections::BTreeSet;
+
 use common::counter::hardware_counter::HardwareCounterCell;
 use common::types::PointOffsetType;
-use itertools::Either;
 
 use super::inverted_index::{Document, InvertedIndex, TokenSet};
 use super::mutable_inverted_index::MutableInvertedIndex;
@@ -39,13 +40,7 @@ impl MutableFullTextIndex {
         let db = self.db_wrapper.lock_db();
         let iter = db.iter()?.map(|(key, value)| {
             let idx = FullTextIndex::restore_key(&key);
-
-            let str_tokens = if phrase_matching {
-                Either::Left(FullTextIndex::deserialize_document(&value)?.into_iter())
-            } else {
-                Either::Right(FullTextIndex::deserialize_token_set(&value)?.into_iter())
-            };
-
+            let str_tokens = FullTextIndex::deserialize_document(&value)?.into_iter();
             Ok((idx, str_tokens))
         });
 
@@ -88,11 +83,15 @@ impl MutableFullTextIndex {
 
         let db_idx = FullTextIndex::store_key(idx);
 
-        let db_document = if phrase_matching {
-            FullTextIndex::serialize_document(str_tokens)?
+        let tokens_to_store = if phrase_matching {
+            // store ordered tokens
+            str_tokens
         } else {
-            FullTextIndex::serialize_token_set(str_tokens.into_iter().collect())?
+            // store unique tokens
+            BTreeSet::from_iter(str_tokens).into_iter().collect()
         };
+
+        let db_document = FullTextIndex::serialize_document(tokens_to_store)?;
 
         self.db_wrapper.put(db_idx, db_document)?;
 
