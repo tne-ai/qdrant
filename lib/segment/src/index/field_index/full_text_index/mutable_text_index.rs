@@ -333,6 +333,7 @@ mod tests {
             lowercase: None,
             on_disk: None,
             phrase_matching: None,
+            stopwords: None,
         };
 
         {
