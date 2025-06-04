@@ -296,6 +296,14 @@ impl<T: Encodable + Numericable + MmapValue + Default> ImmutableNumericIndex<T> 
     }
 
     #[inline]
+    pub(super) fn immutable_files(&self) -> Vec<PathBuf> {
+        match &self.storage {
+            Storage::RocksDb(_) => vec![],
+            Storage::Mmap(index) => index.immutable_files(),
+        }
+    }
+
+    #[inline]
     pub(super) fn flusher(&self) -> Flusher {
         match self.storage {
             Storage::RocksDb(ref db_wrapper) => db_wrapper.flusher(),
