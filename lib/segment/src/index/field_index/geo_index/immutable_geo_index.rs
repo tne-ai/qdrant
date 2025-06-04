@@ -267,6 +267,13 @@ impl ImmutableGeoMapIndex {
         }
     }
 
+    pub fn immutable_files(&self) -> Vec<PathBuf> {
+        match &self.storage {
+            Storage::RocksDb(_) => vec![],
+            Storage::Mmap(index) => index.immutable_files(),
+        }
+    }
+
     pub fn clear(self) -> OperationResult<()> {
         match self.storage {
             Storage::RocksDb(ref db_wrapper) => db_wrapper.remove_column_family(),

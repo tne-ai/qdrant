@@ -237,6 +237,14 @@ impl<T: Encodable + Numericable + MmapValue + Default> NumericIndexInner<T> {
         }
     }
 
+    pub fn immutable_files(&self) -> Vec<PathBuf> {
+        match self {
+            NumericIndexInner::Mutable(_) => vec![],
+            NumericIndexInner::Immutable(index) => index.immutable_files(),
+            NumericIndexInner::Mmap(index) => index.immutable_files(),
+        }
+    }
+
     pub fn remove_point(&mut self, idx: PointOffsetType) -> OperationResult<()> {
         match self {
             NumericIndexInner::Mutable(index) => index.remove_point(idx),
@@ -710,6 +718,10 @@ impl<T: Encodable + Numericable + MmapValue + Default> PayloadFieldIndex for Num
 
     fn files(&self) -> Vec<PathBuf> {
         NumericIndexInner::files(self)
+    }
+
+    fn immutable_files(&self) -> Vec<PathBuf> {
+        NumericIndexInner::immutable_files(self)
     }
 
     fn filter<'a>(
