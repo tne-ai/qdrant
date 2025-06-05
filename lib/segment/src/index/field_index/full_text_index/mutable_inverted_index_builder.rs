@@ -4,6 +4,7 @@ use common::types::PointOffsetType;
 
 use super::inverted_index::{InvertedIndex, TokenSet};
 use super::mutable_inverted_index::MutableInvertedIndex;
+#[cfg(feature = "rocksdb")]
 use crate::common::operation_error::OperationResult;
 
 #[derive(Default)]
@@ -34,6 +35,7 @@ impl MutableInvertedIndexBuilder {
         self.index.point_to_tokens[idx as usize] = Some(tokens_set);
     }
 
+    #[cfg(feature = "rocksdb")]
     pub fn add_iter(
         &mut self,
         iter: impl Iterator<Item = OperationResult<(PointOffsetType, BTreeSet<String>)>>,

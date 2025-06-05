@@ -1,10 +1,11 @@
-use std::collections::{BTreeSet, HashMap};
+#[cfg(feature = "rocksdb")]
+use std::collections::BTreeSet;
+use std::collections::HashMap;
 
 use common::counter::hardware_counter::HardwareCounterCell;
 use common::types::PointOffsetType;
 
 use super::inverted_index::{Document, InvertedIndex, ParsedQuery, TokenId, TokenSet};
-use super::mutable_inverted_index_builder::MutableInvertedIndexBuilder;
 use super::posting_list::PostingList;
 use super::postings_iterator::intersect_postings_iterator;
 use crate::common::operation_error::OperationResult;
@@ -24,11 +25,13 @@ pub struct MutableInvertedIndex {
 }
 
 impl MutableInvertedIndex {
+    #[cfg(feature = "rocksdb")]
     pub fn build_index(
         iter: impl Iterator<Item = OperationResult<(PointOffsetType, BTreeSet<String>)>>,
         // TODO(phrase-index): add param for including phrase field
     ) -> OperationResult<Self> {
-        let mut builder = MutableInvertedIndexBuilder::default();
+        let mut builder =
+            super::mutable_inverted_index_builder::MutableInvertedIndexBuilder::default();
         builder.add_iter(iter)?;
         Ok(builder.build())
     }
