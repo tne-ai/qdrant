@@ -6,6 +6,7 @@ mod sampling;
 mod scroll;
 mod search;
 mod segment_ops;
+mod version_tracker;
 
 pub mod snapshot;
 
@@ -23,6 +24,7 @@ use io::storage_version::StorageVersion;
 use parking_lot::{Mutex, RwLock};
 use rocksdb::DB;
 
+use self::version_tracker::VersionTracker;
 use crate::common::operation_error::{OperationError, OperationResult, SegmentFailedState};
 use crate::id_tracker::IdTrackerSS;
 use crate::index::VectorIndexEnum;
@@ -66,6 +68,7 @@ pub struct Segment {
     pub persisted_version: Arc<Mutex<Option<SeqNumberType>>>,
     /// Path of the storage root
     pub current_path: PathBuf,
+    pub version_tracker: VersionTracker,
     /// Component for mapping external ids to internal and also keeping track of point versions
     pub id_tracker: Arc<AtomicRefCell<IdTrackerSS>>,
     pub vector_data: HashMap<VectorNameBuf, VectorData>,
