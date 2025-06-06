@@ -288,6 +288,7 @@ mod tests {
     use tempfile::Builder;
 
     use super::*;
+    #[cfg(feature = "rocksdb")]
     use crate::common::rocksdb_wrapper::{DB_VECTOR_CF, open_db};
     use crate::types::Payload;
 
@@ -407,6 +408,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(feature = "rocksdb")]
     fn test_get_storage_size() {
         let dir = Builder::new().prefix("storage_dir").tempdir().unwrap();
         let db = open_db(dir.path(), &[DB_VECTOR_CF]).unwrap();
