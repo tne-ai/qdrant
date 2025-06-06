@@ -580,9 +580,11 @@ mod tests {
     use crate::types::ValuesCount;
 
     const FIELD_NAME: &str = "test";
-    const TYPES: [IndexType; 5] = [
+    const TYPES: &[IndexType] = &[
+        #[cfg(feature = "rocksdb")]
         IndexType::Mutable,
         IndexType::MutableGridstore,
+        #[cfg(feature = "rocksdb")]
         IndexType::Immutable,
         IndexType::Mmap,
         IndexType::RamMmap,
