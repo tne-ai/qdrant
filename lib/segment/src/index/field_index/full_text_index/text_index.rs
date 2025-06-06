@@ -588,6 +588,11 @@ mod tests {
         IndexType::RamMmap,
     ];
 
+    #[cfg(feature = "rocksdb")]
+    type Database = Arc<RwLock<DB>>;
+    #[cfg(not(feature = "rocksdb"))]
+    type Database = ();
+
     #[derive(Clone, Copy, PartialEq, Debug)]
     enum IndexType {
         #[cfg(feature = "rocksdb")]
@@ -678,7 +683,7 @@ mod tests {
     }
 
     #[cfg(feature = "testing")]
-    fn create_builder(index_type: IndexType) -> (IndexBuilder, TempDir, Arc<RwLock<DB>>) {
+    fn create_builder(index_type: IndexType) -> (IndexBuilder, TempDir, Database) {
         let temp_dir = Builder::new().prefix("test_dir").tempdir().unwrap();
         let db = open_db_with_existing_cf(&temp_dir.path().join("test_db")).unwrap();
         let config = TextIndexParams::default();
@@ -727,7 +732,7 @@ mod tests {
         keyword_len: usize,
         index_type: IndexType,
         deleted: bool,
-    ) -> (FullTextIndex, TempDir, Arc<RwLock<DB>>) {
+    ) -> (FullTextIndex, TempDir, Database) {
         let mut rnd = StdRng::seed_from_u64(42);
         let (mut builder, temp_dir, db) = create_builder(index_type);
 
