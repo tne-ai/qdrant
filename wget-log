@@ -1,0 +1,16 @@
+--2025-06-06 22:43:31--  https://github.com/qdrant/qdrant-web-ui/releases/download/v0.1.40/dist-qdrant.zip
+Resolving github.com (github.com)... 140.82.114.3
+Connecting to github.com (github.com)|140.82.114.3|:443... connected.
+HTTP request sent, awaiting response... 302 Found
+Location: https://objects.githubusercontent.com/github-production-release-asset-2e65be/607218649/bd1cd301-23c0-40e1-9d65-ec5cf8dc470b?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=releaseassetproduction%2F20250607%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250607T024331Z&X-Amz-Expires=300&X-Amz-Signature=6575b87fd3980d13eeece5ba524494d016432457d5e61687c697a5a595112e1d&X-Amz-SignedHeaders=host&response-content-disposition=attachment%3B%20filename%3Ddist-qdrant.zip&response-content-type=application%2Foctet-stream [following]
+--2025-06-06 22:43:31--  https://objects.githubusercontent.com/github-production-release-asset-2e65be/607218649/bd1cd301-23c0-40e1-9d65-ec5cf8dc470b?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=releaseassetproduction%2F20250607%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250607T024331Z&X-Amz-Expires=300&X-Amz-Signature=6575b87fd3980d13eeece5ba524494d016432457d5e61687c697a5a595112e1d&X-Amz-SignedHeaders=host&response-content-disposition=attachment%3B%20filename%3Ddist-qdrant.zip&response-content-type=application%2Foctet-stream
+Resolving objects.githubusercontent.com (objects.githubusercontent.com)... 185.199.111.133, 185.199.108.133, 185.199.109.133, ...
+Connecting to objects.githubusercontent.com (objects.githubusercontent.com)|185.199.111.133|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 2183405 (2.1M) [application/octet-stream]
+Saving to: ‘dist-qdrant.zip’
+
+dist-qdrant.zip           0%[                             ]       0  --.-KB/s               dist-qdrant.zip          20%[====>                        ] 430.15K  2.10MB/s               dist-qdrant.zip          39%[==========>                  ] 846.15K  2.06MB/s               dist-qdrant.zip          60%[================>            ]   1.26M  2.09MB/s               dist-qdrant.zip          80%[======================>      ]   1.69M  2.05MB/s               dist-qdrant.zip         100%[============================>]   2.08M  2.27MB/s    in 0.9s    
+
+2025-06-06 22:43:32 (2.27 MB/s) - ‘dist-qdrant.zip’ saved [2183405/2183405]
+
