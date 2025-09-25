@@ -1,0 +1,42 @@
+# Mise configuration for Qdrant development environment
+# This ensures consistent tool versions across all developers
+
+[tools]
+# Rust toolchain - minimum required version 1.87
+rust = "1.87.0"
+# Protocol Buffers compiler for gRPC
+protobuf = "28.2"
+
+[env]
+# Rust configuration
+RUST_LOG = "info"
+RUST_BACKTRACE = "1"
+
+# Qdrant specific configurations
+# These can be overridden by local .env files or environment variables
+QDRANT__HTTP_PORT = "6333"
+QDRANT__GRPC_PORT = "6334"
+QDRANT__STORAGE__PATH = "./qdrant_storage"
+
+[tasks.setup]
+description = "Setup development environment"
+run = [
+    "rustup component add rustfmt clippy",
+    "cargo --version",
+    "protoc --version"
+]
+
+[tasks.check-env]
+description = "Check environment setup"
+run = [
+    "echo 'Rust version:' && rustc --version",
+    "echo 'Cargo version:' && cargo --version", 
+    "echo 'Protoc version:' && protoc --version"
+]
+
+# Local environment overrides
+# Create a .mise.local.toml file for local-specific configuration
+# Example:
+# [env]
+# QDRANT__LOG_LEVEL = "debug"
+# CUSTOM_VAR = "local_value"
